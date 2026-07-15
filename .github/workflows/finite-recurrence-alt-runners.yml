@@ -1,0 +1,43 @@
+name: Finite recurrence alternate runners
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.finite-recurrence-alt-trigger'
+
+permissions:
+  contents: read
+
+jobs:
+  compute-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Exact modular computation
+        shell: bash
+        run: |
+          node <<'NODE'
+          function mod(a,p){const r=a%p;return r>=0n?r:r+p}
+          function pow(a,e,p){let z=1n;a=mod(a,p);while(e){if(e&1n)z=mod(z*a,p);a=mod(a*a,p);e>>=1n}return z}
+          function P(t,p){return mod((2n*t+1n)*(17n*t*t+17n*t+5n),p)}
+          function inv(a,p){return pow(a,p-2n,p)}
+          function aperyZeros(prime){const p=BigInt(prime),b=[1n,5n];for(let n=1n;n<=p-2n;n++){const i=Number(n),num=mod(P(n,p)*b[i]-pow(n,3n,p)*b[i-1],p),den=pow(n+1n,3n,p);b.push(mod(num*inv(den,p),p))}const z=[];for(let i=0;i<b.length;i++)if(b[i]===0n)z.push(i);return z}
+          function gap(prime){const p=BigInt(prime);let mx=-1,args=[];for(let x=0n;x<p;x++){let a=0n,b=1n,z=[];for(let h=1n;h<=p-2n;h++){const t=mod(x+h,p),c=mod(P(t,p)*b-pow(t,6n,p)*a,p);a=b;b=c;if(b===0n)z.push(Number(h+1n))}if(z.length>mx){mx=z.length;args=[{x:Number(x),zeros:z}]}else if(z.length===mx)args.push({x:Number(x),zeros:z})}return {p:prime,max:mx,argmax:args}}
+          for(const p of [101,1009]){console.log('APERY='+JSON.stringify({p,zeros:aperyZeros(p)}));console.log('GAP='+JSON.stringify(gap(p)))}
+          NODE
+
+  compute-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Exact modular computation
+        shell: pwsh
+        run: |
+          @'
+          function mod(a,p){const r=a%p;return r>=0n?r:r+p}
+          function pow(a,e,p){let z=1n;a=mod(a,p);while(e){if(e&1n)z=mod(z*a,p);a=mod(a*a,p);e>>=1n}return z}
+          function P(t,p){return mod((2n*t+1n)*(17n*t*t+17n*t+5n),p)}
+          function inv(a,p){return pow(a,p-2n,p)}
+          function aperyZeros(prime){const p=BigInt(prime),b=[1n,5n];for(let n=1n;n<=p-2n;n++){const i=Number(n),num=mod(P(n,p)*b[i]-pow(n,3n,p)*b[i-1],p),den=pow(n+1n,3n,p);b.push(mod(num*inv(den,p),p))}const z=[];for(let i=0;i<b.length;i++)if(b[i]===0n)z.push(i);return z}
+          function gap(prime){const p=BigInt(prime);let mx=-1,args=[];for(let x=0n;x<p;x++){let a=0n,b=1n,z=[];for(let h=1n;h<=p-2n;h++){const t=mod(x+h,p),c=mod(P(t,p)*b-pow(t,6n,p)*a,p);a=b;b=c;if(b===0n)z.push(Number(h+1n))}if(z.length>mx){mx=z.length;args=[{x:Number(x),zeros:z}]}else if(z.length===mx)args.push({x:Number(x),zeros:z})}return {p:prime,max:mx,argmax:args}}
+          for(const p of [101,1009]){console.log('APERY='+JSON.stringify({p,zeros:aperyZeros(p)}));console.log('GAP='+JSON.stringify(gap(p)))}
+          '@ | node
