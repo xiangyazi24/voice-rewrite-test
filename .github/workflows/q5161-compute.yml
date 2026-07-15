@@ -7,6 +7,12 @@ on:
     paths:
       - compute/q5161.sage
       - .github/workflows/q5161-compute.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - compute/q5161.sage
+      - .github/workflows/q5161-compute.yml
 
 permissions:
   contents: write
@@ -23,7 +29,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run exact Sage computation
         run: docker run --rm -v "$PWD:/work" -w /work sagemath/sagemath:latest sage compute/q5161.sage
-      - name: Commit result
+      - name: Print report
+        run: cat compute/q5161-results.md
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: q5161-public-results
+          path: compute/q5161-results.md
+      - name: Commit result on push
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
