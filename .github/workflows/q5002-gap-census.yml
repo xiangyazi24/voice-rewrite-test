@@ -1,0 +1,132 @@
+name: Q5002 exact GAP census
+
+on:
+  push:
+    branches:
+      - agent/q5002-gap-census
+    paths-ignore:
+      - q5002-modules.txt
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/q5002-gap-census
+      - name: Install GAP and TransGrp
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y gap gap-transgrp
+      - name: Enumerate every 12T90 invariant binary submodule
+        run: |
+          cat > /tmp/q5002_modules.g <<'GAP'
+          LoadPackage("transgrp");;
+          SetPrintFormattingStatus("*stdout*", false);;
+          F := GF(2);;
+          H := TransitiveGroup(12,90);;
+          S12 := SymmetricGroup(12);;
+          N := Normalizer(S12,H);;
+
+          Rows := B -> List([1..Length(B)],i -> B[i]);;
+          Supp := v -> Set(Filtered([1..12],i -> v[i] <> Zero(F)));;
+          Code := B -> Set(List(Elements(VectorSpace(F,Rows(B))),Supp));;
+
+          WE := function(B)
+            local out,v,w;
+            out := List([0..12],i->0);
+            for v in Elements(VectorSpace(F,Rows(B))) do
+              w := Length(Supp(v));
+              out[w+1] := out[w+1]+1;
+            od;
+            return out;
+          end;
+
+          RadDim := function(B)
+            if Length(B)=0 then return 0; fi;
+            return Length(B)-RankMat(B*TransposedMat(B));
+          end;
+
+          LiftTop := function(h)
+            local img,i;
+            img := [1..24];
+            for i in [1..12] do
+              img[2*i-1] := 2*(i^h)-1;
+              img[2*i] := 2*(i^h);
+            od;
+            return PermList(img);
+          end;
+
+          FlipPerm := function(v)
+            local img,i;
+            img := [1..24];
+            for i in [1..12] do
+              if v[i] <> Zero(F) then
+                img[2*i-1] := 2*i;
+                img[2*i] := 2*i-1;
+              fi;
+            od;
+            return PermList(img);
+          end;
+
+          SplitGroup := function(B)
+            local gens;
+            gens := List(Rows(B),FlipPerm);
+            Append(gens,List(GeneratorsOfGroup(H),LiftTop));
+            return Group(gens);
+          end;
+
+          OnCodes := function(C,g)
+            return Set(List(C,A->OnSets(A,g)));
+          end;
+
+          subs := MTX.BasesSubmodules(PermutationGModule(H,F));;
+          recs := [];
+          Print("HEADER|HORDER=",Size(H),"|NORDER=",Size(N),"|SUBS=",Length(subs),"\n");
+          for i in [1..Length(subs)] do
+            B := subs[i];
+            C := Code(B);
+            G := SplitGroup(B);
+            tid := TransitiveIdentification(G);
+            r := rec(idx:=i,dim:=Length(B),we:=WE(B),rad:=RadDim(B),tid:=tid,code:=C);
+            Add(recs,r);
+            Print("MODULE|IDX=",i,"|DIM=",r.dim,"|RAD=",r.rad,"|TID=",r.tid,"|WE=",r.we,"\n");
+          od;
+
+          keys := Set(List(recs,r->[r.dim,r.we,r.rad,r.tid]));
+          for k in keys do
+            members := Filtered(recs,r->[r.dim,r.we,r.rad,r.tid]=k);
+            Print("CLASS|DIM=",k[1],"|RAD=",k[3],"|TID=",k[4],"|COUNT=",Length(members),"|WE=",k[2],"\n");
+          od;
+
+          todo := [1..Length(recs)];;
+          while Length(todo)>0 do
+            i := todo[1];
+            orb := Orbit(N,recs[i].code,OnCodes);
+            members := Filtered(todo,j->recs[j].code in orb);
+            Print("ORBIT|REP=",i,"|DIM=",recs[i].dim,"|RAD=",recs[i].rad,
+                  "|TID=",recs[i].tid,"|SIZE=",Length(members),"|INDICES=",members,
+                  "|WE=",recs[i].we,"\n");
+            todo := Filtered(todo,j->not j in members);
+          od;
+          QUIT;
+          GAP
+          gap -q /tmp/q5002_modules.g | tee q5002-modules.txt
+      - name: Persist result on the temporary branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add q5002-modules.txt
+          git diff --cached --quiet || git commit -m "Q5002 GAP census result [skip ci]"
+          git push origin HEAD:agent/q5002-gap-census
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q5002-gap-census
+          path: q5002-modules.txt
