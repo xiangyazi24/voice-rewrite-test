@@ -1,0 +1,42 @@
+name: Q5161 fast exact computation
+
+on:
+  push:
+    branches:
+      - chatgpt-sagecell-q5161
+    paths:
+      - compute/q5161_fast.py
+      - .github/workflows/q5161-fast.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - compute/q5161_fast.py
+      - .github/workflows/q5161-fast.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: q5161-fast-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  fast:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install sympy
+      - run: python compute/q5161_fast.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q5161-fast-${{ matrix.os }}
+          path: compute/q5161-fast-results.md
