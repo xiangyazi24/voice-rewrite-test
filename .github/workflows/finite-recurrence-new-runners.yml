@@ -1,0 +1,43 @@
+name: Finite recurrence new runners
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.finite-recurrence-new-trigger'
+
+permissions:
+  contents: read
+
+jobs:
+  compute-slim:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Exact modular computation
+        shell: bash
+        run: |
+          node <<'NODE'
+          function mod(a,p){const r=a%p;return r>=0n?r:r+p}
+          function pow(a,e,p){let z=1n;a=mod(a,p);while(e){if(e&1n)z=mod(z*a,p);a=mod(a*a,p);e>>=1n}return z}
+          function P(t,p){return mod((2n*t+1n)*(17n*t*t+17n*t+5n),p)}
+          function inv(a,p){return pow(a,p-2n,p)}
+          function az(prime){const p=BigInt(prime),b=[1n,5n];for(let n=1n;n<=p-2n;n++){const i=Number(n);b.push(mod((P(n,p)*b[i]-pow(n,3n,p)*b[i-1])*inv(pow(n+1n,3n,p),p),p))}return b.flatMap((v,i)=>v===0n?[i]:[])}
+          function gap(prime){const p=BigInt(prime);let max=-1,argmax=[];for(let x=0n;x<p;x++){let a=0n,b=1n,z=[];for(let h=1n;h<=p-2n;h++){let t=mod(x+h,p),c=mod(P(t,p)*b-pow(t,6n,p)*a,p);a=b;b=c;if(b===0n)z.push(Number(h+1n))}if(z.length>max){max=z.length;argmax=[{x:Number(x),zeros:z}]}else if(z.length===max)argmax.push({x:Number(x),zeros:z})}return {p:prime,max,argmax}}
+          for(const p of [101,1009]){console.log(JSON.stringify({apery:{p,zeros:az(p)},gap:gap(p)}))}
+          NODE
+
+  compute-arm:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Exact modular computation
+        shell: bash
+        run: |
+          node <<'NODE'
+          function mod(a,p){const r=a%p;return r>=0n?r:r+p}
+          function pow(a,e,p){let z=1n;a=mod(a,p);while(e){if(e&1n)z=mod(z*a,p);a=mod(a*a,p);e>>=1n}return z}
+          function P(t,p){return mod((2n*t+1n)*(17n*t*t+17n*t+5n),p)}
+          function inv(a,p){return pow(a,p-2n,p)}
+          function az(prime){const p=BigInt(prime),b=[1n,5n];for(let n=1n;n<=p-2n;n++){const i=Number(n);b.push(mod((P(n,p)*b[i]-pow(n,3n,p)*b[i-1])*inv(pow(n+1n,3n,p),p),p))}return b.flatMap((v,i)=>v===0n?[i]:[])}
+          function gap(prime){const p=BigInt(prime);let max=-1,argmax=[];for(let x=0n;x<p;x++){let a=0n,b=1n,z=[];for(let h=1n;h<=p-2n;h++){let t=mod(x+h,p),c=mod(P(t,p)*b-pow(t,6n,p)*a,p);a=b;b=c;if(b===0n)z.push(Number(h+1n))}if(z.length>max){max=z.length;argmax=[{x:Number(x),zeros:z}]}else if(z.length===max)argmax.push({x:Number(x),zeros:z})}return {p:prime,max,argmax}}
+          for(const p of [101,1009]){console.log(JSON.stringify({apery:{p,zeros:az(p)},gap:gap(p)}))}
+          NODE
