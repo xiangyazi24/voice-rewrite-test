@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - agent/q5002-gap-census
+    paths-ignore:
+      - q5002-modules.txt
   pull_request:
     branches:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   census:
@@ -17,6 +19,8 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: agent/q5002-gap-census
       - name: Install GAP and TransGrp
         run: |
           sudo apt-get update -qq
@@ -102,7 +106,6 @@ jobs:
             Print("CLASS|DIM=",k[1],"|RAD=",k[3],"|TID=",k[4],"|COUNT=",Length(members),"|WE=",k[2],"\n");
           od;
 
-          # Split each class further into normalizer orbits of labeled codes.
           todo := [1..Length(recs)];;
           while Length(todo)>0 do
             i := todo[1];
@@ -116,6 +119,13 @@ jobs:
           QUIT;
           GAP
           gap -q /tmp/q5002_modules.g | tee q5002-modules.txt
+      - name: Persist result on the temporary branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add q5002-modules.txt
+          git diff --cached --quiet || git commit -m "Q5002 GAP census result [skip ci]"
+          git push origin HEAD:agent/q5002-gap-census
       - uses: actions/upload-artifact@v4
         with:
           name: q5002-gap-census
