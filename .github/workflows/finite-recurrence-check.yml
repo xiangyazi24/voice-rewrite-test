@@ -1,0 +1,114 @@
+name: Finite recurrence verification
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.finite-recurrence-trigger'
+
+permissions:
+  contents: read
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exact modular computation
+        shell: bash
+        run: |
+          node <<'NODE'
+          function mod(a, p) {
+            const r = a % p;
+            return r >= 0n ? r : r + p;
+          }
+          function powMod(a, e, p) {
+            let z = 1n;
+            a = mod(a, p);
+            while (e > 0n) {
+              if ((e & 1n) !== 0n) z = mod(z * a, p);
+              a = mod(a * a, p);
+              e >>= 1n;
+            }
+            return z;
+          }
+          function P(t, p) {
+            return mod((2n * t + 1n) * (17n * t * t + 17n * t + 5n), p);
+          }
+          function inv(a, p) { return powMod(a, p - 2n, p); }
+
+          function aperyZeros(prime) {
+            const p = BigInt(prime);
+            const b = [1n, mod(5n, p)];
+            for (let n = 1n; n <= p - 2n; n++) {
+              const i = Number(n);
+              const num = mod(P(n, p) * b[i] - powMod(n, 3n, p) * b[i - 1], p);
+              const den = powMod(n + 1n, 3n, p);
+              b.push(mod(num * inv(den, p), p));
+            }
+            const zeros = [];
+            for (let n = 0; n < b.length; n++) if (b[n] === 0n) zeros.push(n);
+            return zeros;
+          }
+
+          function gapData(prime) {
+            const p = BigInt(prime);
+            let rawMax = -1;
+            let rawArgmax = [];
+            let preMax = -1;
+            let preArgmax = [];
+            const rawHistogram = new Map();
+            const preHistogram = new Map();
+
+            for (let x = 0n; x < p; x++) {
+              let sPrev = 0n; // s_0
+              let s = 1n;     // s_1
+              const rawZeros = [];
+              const preZeros = [];
+              const preLimit = p - 1n - x;
+
+              for (let h = 1n; h <= p - 2n; h++) {
+                const t = mod(x + h, p);
+                const sNext = mod(P(t, p) * s - powMod(t, 6n, p) * sPrev, p);
+                sPrev = s;
+                s = sNext;
+                const index = h + 1n;
+                if (s === 0n) {
+                  rawZeros.push(Number(index));
+                  if (index <= preLimit) preZeros.push(Number(index));
+                }
+              }
+
+              const rawCount = rawZeros.length;
+              const preCount = preZeros.length;
+              rawHistogram.set(rawCount, (rawHistogram.get(rawCount) || 0) + 1);
+              preHistogram.set(preCount, (preHistogram.get(preCount) || 0) + 1);
+
+              const rawEntry = {x:Number(x), zeros:rawZeros};
+              if (rawCount > rawMax) {
+                rawMax = rawCount;
+                rawArgmax = [rawEntry];
+              } else if (rawCount === rawMax) rawArgmax.push(rawEntry);
+
+              const preEntry = {x:Number(x), limit:Number(preLimit), zeros:preZeros};
+              if (preCount > preMax) {
+                preMax = preCount;
+                preArgmax = [preEntry];
+              } else if (preCount === preMax) preArgmax.push(preEntry);
+            }
+
+            return {
+              p: prime,
+              rawMax,
+              rawArgmax,
+              preMax,
+              preArgmax,
+              rawHistogram:[...rawHistogram.entries()].sort((a,b)=>a[0]-b[0]),
+              preHistogram:[...preHistogram.entries()].sort((a,b)=>a[0]-b[0])
+            };
+          }
+
+          for (const p of [101, 1009]) {
+            console.log('APERY=' + JSON.stringify({p, zeros:aperyZeros(p)}));
+            console.log('GAP=' + JSON.stringify(gapData(p)));
+          }
+          NODE
