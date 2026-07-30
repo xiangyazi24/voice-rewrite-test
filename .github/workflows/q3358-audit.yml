@@ -9,7 +9,7 @@ permissions:
 jobs:
   audit:
     if: github.actor != 'github-actions[bot]'
-    runs-on: self-hosted
+    runs-on: macos-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
