@@ -16,7 +16,7 @@ jobs:
         with:
           ref: agent/q3420-scan
       - name: Compile
-        run: g++ -O3 -DNDEBUG -std=c++17 -fopenmp q3420_scan.cpp -o q3420_scan
+        run: g++ -O3 -std=c++17 -fopenmp q3420_scan.cpp -o q3420_scan
       - name: Run
         env:
           OMP_NUM_THREADS: 4
