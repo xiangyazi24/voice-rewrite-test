@@ -1,0 +1,30 @@
+name: Q3420 exact scan
+on:
+  push:
+    branches: [agent/q3420-scan]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  scan:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/q3420-scan
+      - name: Compile
+        run: g++ -O3 -DNDEBUG -std=c++17 -fopenmp q3420_scan.cpp -o q3420_scan
+      - name: Run
+        env:
+          OMP_NUM_THREADS: 4
+        run: ./q3420_scan 2>Q3420-scan-stderr.txt | tee Q3420-scan-output.txt
+      - name: Commit output
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add Q3420-scan-output.txt Q3420-scan-stderr.txt
+          git commit -m "Record Q3420 exact scan output [skip ci]"
+          git push origin HEAD:agent/q3420-scan
