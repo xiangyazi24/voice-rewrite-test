@@ -1,0 +1,20 @@
+name: Q3400 exact top-target scan
+
+on:
+  push:
+    branches: [agent/q3400-scan]
+  pull_request:
+    branches: [main]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/q3400-scan
+      - name: Compile
+        run: g++ -O3 -std=c++17 -Wall -Wextra -pedantic q3400_top_target_scan.cpp -o q3400_scan
+      - name: Run exact scan
+        run: ./q3400_scan
