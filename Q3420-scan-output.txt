@@ -1,0 +1,91 @@
+maximum_n=200000
+prime_count=17981
+zero_pairs_folded=7516
+max_K=3
+rows_K_ge_3=12
+rows_K_ge_4=0
+ROW n=321 K=3 pattern=RRR pspan=32 jspan=64
+  stars: (179,r=142,j=36,R) (193,r=128,j=64,R) (211,r=110,j=100,R)
+  branch_D:count=0,pspan=0,jspan=0,min4=none
+  branch_R:count=3,pspan=32,jspan=64,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=11576 K=3 pattern=DDD pspan=2544 jspan=2544
+  stars: (8893,r=2683,j=2683,D) (9319,r=2257,j=2257,D) (11437,r=139,j=139,D)
+  branch_D:count=3,pspan=2544,jspan=2544,min4=none
+  branch_R:count=0,pspan=0,jspan=0,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=18444 K=3 pattern=RDD pspan=4722 jspan=1026
+  stars: (10847,r=7597,j=3249,R) (14543,r=3901,j=3901,D) (15569,r=2875,j=2875,D)
+  branch_D:count=2,pspan=1026,jspan=1026,min4=none
+  branch_R:count=1,pspan=0,jspan=0,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=22101 K=3 pattern=RDD pspan=8862 jspan=4808
+  stars: (13177,r=8924,j=4252,R) (17231,r=4870,j=4870,D) (22039,r=62,j=62,D)
+  branch_D:count=2,pspan=4808,jspan=4808,min4=none
+  branch_R:count=1,pspan=0,jspan=0,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=26164 K=3 pattern=DDD pspan=5976 jspan=5976
+  stars: (19213,r=6951,j=6951,D) (22147,r=4017,j=4017,D) (25189,r=975,j=975,D)
+  branch_D:count=3,pspan=5976,jspan=5976,min4=none
+  branch_R:count=0,pspan=0,jspan=0,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=47066 K=3 pattern=RRR pspan=5136 jspan=10272
+  stars: (25903,r=21163,j=4739,R) (29629,r=17437,j=12191,R) (31039,r=16027,j=15011,R)
+  branch_D:count=0,pspan=0,jspan=0,min4=none
+  branch_R:count=3,pspan=5136,jspan=10272,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=47859 K=3 pattern=RRD pspan=11014 jspan=11580
+  stars: (24517,r=23342,j=1174,R) (30307,r=17552,j=12754,R) (35531,r=12328,j=12328,D)
+  branch_D:count=1,pspan=0,jspan=0,min4=none
+  branch_R:count=2,pspan=5790,jspan=11580,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=63887 K=3 pattern=RDD pspan=17378 jspan=8886
+  stars: (39761,r=24126,j=15634,R) (56779,r=7108,j=7108,D) (57139,r=6748,j=6748,D)
+  branch_D:count=2,pspan=360,jspan=360,min4=none
+  branch_R:count=1,pspan=0,jspan=0,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=64555 K=3 pattern=RDD pspan=23424 jspan=11396
+  stars: (32479,r=32076,j=402,R) (52757,r=11798,j=11798,D) (55903,r=8652,j=8652,D)
+  branch_D:count=2,pspan=3146,jspan=3146,min4=none
+  branch_R:count=1,pspan=0,jspan=0,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=105433 K=3 pattern=RRD pspan=39824 jspan=30608
+  stars: (65129,r=40304,j=24824,R) (68261,r=37172,j=31088,R) (104953,r=480,j=480,D)
+  branch_D:count=1,pspan=0,jspan=0,min4=none
+  branch_R:count=2,pspan=3132,jspan=6264,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=182715 K=3 pattern=RDD pspan=60922 jspan=35760
+  stars: (91807,r=90908,j=898,R) (146057,r=36658,j=36658,D) (152729,r=29986,j=29986,D)
+  branch_D:count=2,pspan=6672,jspan=6672,min4=none
+  branch_R:count=1,pspan=0,jspan=0,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+ROW n=184862 K=3 pattern=RRD pspan=36518 jspan=30168
+  stars: (105389,r=79473,j=25915,R) (120473,r=64389,j=56083,R) (141907,r=42955,j=42955,D)
+  branch_D:count=1,pspan=0,jspan=0,min4=none
+  branch_R:count=2,pspan=15084,jspan=30168,min4=none
+  branch_C:count=0,pspan=0,jspan=0,min4=none
+  cross_hits: none
+  repeated_nodes: none
+AUDIT_OK
