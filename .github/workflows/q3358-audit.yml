@@ -1,0 +1,24 @@
+name: Q3358 audit
+on:
+  push:
+    branches: [agent/q3358-audit]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  audit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/q3358-audit
+      - run: python3 q3358_audit.py | tee Q3358-audit-output.txt
+      - run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add Q3358-audit-output.txt
+          git commit -m "Record Q3358 audit output [skip ci]"
+          git push origin HEAD:agent/q3358-audit
